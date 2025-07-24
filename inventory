@@ -1,4 +1,4 @@
 server-1@192.168.43.177 apache_package=apache2 php_package=libapache2-mod-php
 server-2@192.168.43.197 apache_package=apache2 php_package=libapache2-mod-php
-
+server-3@192.168.43.241 apache_package=apache2 php_package=libapache2-mod-php
 
