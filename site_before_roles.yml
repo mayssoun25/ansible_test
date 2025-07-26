@@ -1,0 +1,82 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: update repo cache (Ubuntu)
+    tags: always
+    apt:
+      update_cache: yes
+    changed_when: false
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: all
+  become: true
+  tasks:
+
+
+  - name: add ssh key for mayssoun
+    tags: always
+    authorized_key:
+      user: mayssoun
+      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC8G8xvYDaZet9L5lYlssWuxlqcF/yFE2VM6UdnYKrrWT0xVSs2Ygg7lQybSvfDTOJXE1xJhBLtKcuuqasUZNr82wB0AiLUHAgHGN/7aMxV5gvmtQLsPMIjOrDP1fa+UD3X8xFo5dROHdRCAtWmqr+8XHSxrhSngBjR9WUuaMgeYtC4WwxwNfYzuBV5N/S+kwyRxvb0Sqv7lkSZUKM45LUD8LigvvkxFSdIOH3pkKZoed2XFHdPyb+nKSHJhLQomMiwMnVSti/qCASdnoIzhgHQeZusIg2IINL1+bCK3+LOynkH1BiYO26+hLrLisyWQ56xkcKjyX4XT0QF24TgnZrhPS9hPCIKPqcmput3gKbsYTbUOqdme6zX9+hWc2RFkU0iyYCyUCLK0eKDOCFszbAk9Eumhg9zvDZAYGfj/hrbKoOc6orPIFFgJ6cAWSJTFLM7L0AVuFeQ01CAQcNvc2fNjKpEBbC2F/8qEDhidxz6XzyTMDHE+jIxDw94C462rNgHHzAFQEaXFtYL5N46jyLEp4Ptij24lxFIdka8bcyoEyHsr6kjZegUz11CxxrRsSlzyd6w288A+702IK0Ou4bL3fCGWqNXJKOc0iOPI9boQemqmEPdnmMeHEwEGyqJOQomVGwUUlZ+APq03Fjhl+2g7i3iXTfoB/isyoZ8O+so8Q== mayssoun@mayssoun-Lenovo-G50-70"
+   
+
+- hosts: workstations
+  become: true 
+  tasks:
+  - name: install unzip
+    package:
+      name: unzip
+
+  - name: install terraform
+    unarchive: 
+      src: https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
+
+- hosts: web_servers
+  become: true
+  tasks:
+
+  - name: install apache and php for Ubuntu servers
+    tags: apache,apache2,ubuntu  
+    package:
+      name: 
+        - "{{ apache_package }}"
+        - "{{ php_package }}"
+      state: latest
+      update_cache: yes
+
+  - name: copy default html file forsite
+    tags: apache,apache2,httpd
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+  - name: install mariadb package (Ubuntu)
+    tags: db,mariadb,ubuntu
+    apt:
+     name: mariadb-server
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: file_servers
+  become: true
+  tasks:
+  - name: install samba package
+    tags: samba
+    apt: 
+     name: samba
+     state: latest
+    when: ansible_distribution == "Ubuntu"
