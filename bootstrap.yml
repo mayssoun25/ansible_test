@@ -1,0 +1,38 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: create mayssoun user
+    tags: always
+    user:
+      name: mayssoun
+      groups: root
+
+  - name: add ssh key for mayssoun
+    tags: always
+    authorized_key:
+      user: mayssoun
+      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC8G8xvYDaZet9L5lYlssWuxlqcF/yFE2VM6UdnYKrrWT0xVSs2Ygg7lQybSvfDTOJXE1xJhBLtKcuuqasUZNr82wB0AiLUHAgHGN/7aMxV5gvmtQLsPMIjOrDP1fa+UD3X8xFo5dROHdRCAtWmqr+8XHSxrhSngBjR9WUuaMgeYtC4WwxwNfYzuBV5N/S+kwyRxvb0Sqv7lkSZUKM45LUD8LigvvkxFSdIOH3pkKZoed2XFHdPyb+nKSHJhLQomMiwMnVSti/qCASdnoIzhgHQeZusIg2IINL1+bCK3+LOynkH1BiYO26+hLrLisyWQ56xkcKjyX4XT0QF24TgnZrhPS9hPCIKPqcmput3gKbsYTbUOqdme6zX9+hWc2RFkU0iyYCyUCLK0eKDOCFszbAk9Eumhg9zvDZAYGfj/hrbKoOc6orPIFFgJ6cAWSJTFLM7L0AVuFeQ01CAQcNvc2fNjKpEBbC2F/8qEDhidxz6XzyTMDHE+jIxDw94C462rNgHHzAFQEaXFtYL5N46jyLEp4Ptij24lxFIdka8bcyoEyHsr6kjZegUz11CxxrRsSlzyd6w288A+702IK0Ou4bL3fCGWqNXJKOc0iOPI9boQemqmEPdnmMeHEwEGyqJOQomVGwUUlZ+APq03Fjhl+2g7i3iXTfoB/isyoZ8O+so8Q== mayssoun@mayssoun-Lenovo-G50-70"
+   
+  - name: add sudoers file for mayssoun
+    tags: always
+    copy:
+      src: sudoer_mayssoun
+      dest: /etc/sudoers.d/simone
+      owner: root
+      group: root
+      mode: 0440
+
